@@ -1,0 +1,135 @@
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using Microsoft.VisualBasic;
+using System.Linq;
+
+namespace CrimeAnalyser
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            if (args == null)
+              {
+                Console.WriteLine("args is null");
+             }
+             else
+             {
+            try
+            {
+                List<CrimeStats> crimeStatsList = new List<CrimeStats>();
+
+                var reader = new StreamReader("Crimedata.csv");
+
+                reader.ReadLine();
+
+                while (!reader.EndOfStream)
+                {
+                    var entries = reader.ReadLine().Split(',');
+
+
+                    int year = Int32.Parse(entries[0]);
+                    int population = Int32.Parse(entries[1]);
+                    int violentCrimes = Int32.Parse(entries[2]);
+                    int murder = Int32.Parse(entries[3]);
+                    int rape = Int32.Parse(entries[4]);
+                    int robbery = Int32.Parse(entries[5]);
+                    int aggravatedAssault = Int32.Parse(entries[6]);
+                    int propertyCrime = Int32.Parse(entries[7]);
+                    int burglary = Int32.Parse(entries[8]);
+                    int theft = Int32.Parse(entries[9]);
+                    int motorVehicleTheft = Int32.Parse(entries[10]);
+
+                    CrimeStats stats = new CrimeStats(year, population, violentCrimes, murder, rape,
+                                                      robbery, aggravatedAssault, propertyCrime, burglary,
+                                                      theft, motorVehicleTheft);
+                    crimeStatsList.Add(stats);
+                }
+
+                Console.WriteLine("Crime Analyzer Report\n");
+                int years = (from stats in crimeStatsList select stats.Year).Count();
+                Console.WriteLine("Period: {0}years", years);
+
+                var Myears = from stats in crimeStatsList where stats.Murder < 15000 select stats.Year;
+                Console.Write("Years murders per year < 15000: ");
+                foreach (var m in Myears)
+                {
+                    Console.Write("{0} ", m);
+                }
+
+                var Rob = from stats in crimeStatsList where stats.Robbery > 500000 select new { stats.Year, stats.Robbery };
+                Console.Write("\nRobberies per year > 500000: ");
+                foreach (var r in Rob)
+                {
+                    Console.Write("{0} = {1} ", r.Year, r.Robbery);
+                }
+
+                var capita = from stats in crimeStatsList where stats.Year.Equals(2010) select (stats.ViolentCrimes / stats.Population);
+                Console.Write("\nViolent crime per capita rate (2010): ");
+                foreach (var c in capita)
+                {
+                    Console.Write(c);
+                }
+
+                double average1 = (from stats in crimeStatsList select stats.Murder).Average();
+                Console.WriteLine("\nAverage murder per year (all years): {0}", average1);
+
+                double average2 = (from stats in crimeStatsList where stats.Year >= 1994 & stats.Year <= 1997 select stats.Murder).Average();
+                Console.Write("Average murder per year (1994-1997): {0}", average2);
+
+                double average3 = (from stats in crimeStatsList where stats.Year >= 2010 & stats.Year <= 2014 select stats.Murder).Average();
+                Console.Write("\nAverage murder per year (2010-2014): {0}", average3);
+
+                int minimum1 = (from stats in crimeStatsList where stats.Year >= 1999 & stats.Year <= 2004 select stats.Theft).Min();
+                Console.Write("\nMinimum thefts per year (1999-2004): {0}", minimum1);
+
+                int max1 = (from stats in crimeStatsList where stats.Year >= 1999 & stats.Year <= 2004 select stats.Theft).Max();
+                Console.Write("\nMaximum thefts per year (1999-2004): {0}", max1);
+
+                var max2 = from stats in crimeStatsList where stats.MotorVehicleTheft > 1472441 select stats.Year;
+                foreach (var m in max2)
+                {
+                    Console.Write("\nYear of highest number of motor vehicle thefts: {0}", m);
+                }
+
+                Console.ReadLine();
+
+            }
+            catch (Exception e) { Console.WriteLine("Exception: " + e.Message); }
+        }
+    }
+         }
+
+    public class CrimeStats
+    {
+        public int Year { get; set; }
+        public int Population { get; set; }
+        public int ViolentCrimes { get; set; }
+        public int Murder { get; set; }
+        public int Rape { get; set; }
+        public int Robbery { get; set; }
+        public int AggravatedAssault { get; set; }
+        public int PropertyCrime { get; set; }
+        public int Burglary { get; set; }
+        public int Theft { get; set; }
+        public int MotorVehicleTheft { get; set; }
+
+        public CrimeStats(int year, int population, int violentCrimes, int murder,
+                         int rape, int robbery, int aggravatedAssault, int propertyCrime,
+                          int burglary, int theft, int motorVehicleTheft)
+        {
+            Year = year; Population = population; ViolentCrimes = violentCrimes;
+            Murder = murder; Rape = rape; Robbery = robbery; AggravatedAssault = aggravatedAssault;
+            PropertyCrime = propertyCrime; Burglary = burglary; Theft = theft; MotorVehicleTheft = motorVehicleTheft;
+        }
+         
+    }
+    }
+
+               
+
+        
+            
+
+
